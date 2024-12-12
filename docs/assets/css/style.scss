@@ -1,0 +1,37 @@
+---
+---
+
+@import 'jekyll-theme-leap-day';
+
+
+header {
+  background: #326CE5;
+  h1 {
+    font: 32px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: #FFFFFF;
+    font-weight:400;
+  }
+}
+
+#banner {
+  background: #09C1D1;
+  border: 1px solid #09C1D1;
+}
+
+#banner .button {
+  border: 1px solid #09C1D1; 
+  background: linear-gradient(#C9E9EC, #09C1D1);
+}
+
+body {
+  background-color: #FFFFFF;
+  background: #DEDEDE;
+  font: 14px/1.5 "Noto Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color:#323232;
+  font-weight:400;
+}
+
+nav ul a { color: #323232; }
+nav ul a:hover { color: #326CE5; }
+
+h3, h4, h5, h6 { color: #242424; }
