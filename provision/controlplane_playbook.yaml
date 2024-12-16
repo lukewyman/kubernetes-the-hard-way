@@ -1,0 +1,101 @@
+---
+
+- 
+
+  hosts: 
+  - jumpbox
+  - controlplane
+
+  tasks:
+  - name: Ping the host 
+    ping: 
+
+  - name: Create the /etc/ssl/crt directory
+    file:
+      path: /etc/ssl/crt
+      state: directory
+      mode: '0755'
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Create the /etc/ssl/csr directory
+    file: 
+      path: /etc/ssl/csr
+      state: directory
+      mode: '0755'
+    when: inventory_hostname == 'jumpbox'
+
+  # PROVISION A CERTFICATE AUTHORITY
+
+  - name: Create a private key for the CA 
+    openssl_privatekey:
+      path: /etc/ssl/private/kthw-ca.key
+      size: 2048
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Create the CA CSR with the CA private key
+    openssl_csr:
+      path: /etc/ssl/csr/kthw-ca.csr
+      privatekey_path: /etc/ssl/private/kthw-ca.key
+      common_name: KUBERNETES-CA
+      organization_name: Kubernetes
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Create the CA self-signed certficate
+    openssl_certificate:
+      path: /etc/ssl/crt/kthw-ca.crt
+      privatekey_path: /etc/ssl/private/kthw-ca.key
+      csr_path: /etc/ssl/csr/kthw-ca.csr
+      provider: selfsigned
+    when: inventory_hostname == 'jumpbox'
+
+# GENERATE THE ADMIN CLIENT CERTIFICATE
+
+  - name: Generate a private key for the admin user
+    openssl_privatekey:
+      path: /etc/ssl/private/kthw-admin.key
+      size: 2048
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Generate the CSR for the admin user. 
+    openssl_csr:
+      path: /etc/ssl/csr/kthw-admin.csr
+      privatekey_path: /etc/ssl/private/kthw-admin.key
+      common_name: 'admin'
+      organization_name: 'system:masters'
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Sign certificate for admin user using CA server's private key
+    openssl_certificate:
+      path: /etc/ssl/crt/kthw-admin.crt
+      csr_path: /etc/ssl/csr/kthw-admin.csr
+      ownca_path: /etc/ssl/crt/kthw-ca.crt
+      ownca_privatekey_path: /etc/ssl/private/kthw-ca.key 
+      provider: ownca
+    when: inventory_hostname == 'jumpbox'
+
+# GENERATE THE CONTROLLER MANAGER CLIENT CERTFICATE
+
+  - name: Generate a private key for the Kube Controller Manager
+    openssl_privatekey:
+      path: /etc/ssl/private/kthw-kube-controller-manager.key
+      size: 2048
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Generate the CSR for the Kube Controller Manager
+    openssl_csr:
+      path: /etc/ssl/csr/kthw-kube-controller-manager.csr
+      privatekey_path: /etc/ssl/private/kthw-kube-controller-manager.key
+      common_name: 'system:kube-controller-manager'
+      organization_name: 'system:kube-controller-manager'
+    when: inventory_hostname == 'jumpbox'
+
+  - name: Sign certficate for Kube Controller Manager using CA server's private key
+    openssl_certificate:
+      path: /etc/ssl/crt/kthw-kube-controller-manager.crt
+      csr_path: /etc/ssl/csr/kthw-kube-controller-manager.csr
+      ownca_path: /etc/ssl/crt/kthw-ca.crt
+      ownca_privatekey_path: /etc/ssl/private/kthw-ca.key 
+      provider: ownca
+    when: inventory_hostname == 'jumpbox'
+    
+...
