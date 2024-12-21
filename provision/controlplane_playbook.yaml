@@ -1,101 +1,159 @@
 ---
 
-- 
-
+- name: Create server and client certificates
   hosts: 
   - jumpbox
-  - controlplane
 
   tasks:
   - name: Ping the host 
     ping: 
 
-  - name: Create the /etc/ssl/crt directory
+  - name: Create the /etc/ssl/kthw/crt directory
     file:
-      path: /etc/ssl/crt
+      path: /etc/ssl/kthw/crt
       state: directory
       mode: '0755'
-    when: inventory_hostname == 'jumpbox'
 
-  - name: Create the /etc/ssl/csr directory
+  - name: Create the /etc/ssl/kthw/csr directory
     file: 
-      path: /etc/ssl/csr
+      path: /etc/ssl/kthw/csr
       state: directory
       mode: '0755'
-    when: inventory_hostname == 'jumpbox'
+
+  - name: Create the /etc/ssl/kthw/private directory
+    file:
+      path: /etc/ssl/kthw/private
+      state: directory
+      mode: '0755'
 
   # PROVISION A CERTFICATE AUTHORITY
 
   - name: Create a private key for the CA 
     openssl_privatekey:
-      path: /etc/ssl/private/kthw-ca.key
+      path: /etc/ssl/kthw/private/ca.key
       size: 2048
-    when: inventory_hostname == 'jumpbox'
 
   - name: Create the CA CSR with the CA private key
     openssl_csr:
-      path: /etc/ssl/csr/kthw-ca.csr
-      privatekey_path: /etc/ssl/private/kthw-ca.key
+      path: /etc/ssl/kthw/csr/ca.csr
+      privatekey_path: /etc/ssl/kthw/private/ca.key
       common_name: KUBERNETES-CA
       organization_name: Kubernetes
-    when: inventory_hostname == 'jumpbox'
 
   - name: Create the CA self-signed certficate
     openssl_certificate:
-      path: /etc/ssl/crt/kthw-ca.crt
-      privatekey_path: /etc/ssl/private/kthw-ca.key
-      csr_path: /etc/ssl/csr/kthw-ca.csr
+      path: /etc/ssl/kthw/crt/ca.crt
+      privatekey_path: /etc/ssl/kthw/private/ca.key
+      csr_path: /etc/ssl/kthw/csr/ca.csr
       provider: selfsigned
-    when: inventory_hostname == 'jumpbox'
 
 # GENERATE THE ADMIN CLIENT CERTIFICATE
 
   - name: Generate a private key for the admin user
     openssl_privatekey:
-      path: /etc/ssl/private/kthw-admin.key
+      path: /etc/ssl/kthw/private/admin.key
       size: 2048
-    when: inventory_hostname == 'jumpbox'
 
   - name: Generate the CSR for the admin user. 
     openssl_csr:
-      path: /etc/ssl/csr/kthw-admin.csr
-      privatekey_path: /etc/ssl/private/kthw-admin.key
+      path: /etc/ssl/kthw/csr/admin.csr
+      privatekey_path: /etc/ssl/kthw/private/admin.key
       common_name: 'admin'
       organization_name: 'system:masters'
-    when: inventory_hostname == 'jumpbox'
 
   - name: Sign certificate for admin user using CA server's private key
     openssl_certificate:
-      path: /etc/ssl/crt/kthw-admin.crt
-      csr_path: /etc/ssl/csr/kthw-admin.csr
-      ownca_path: /etc/ssl/crt/kthw-ca.crt
-      ownca_privatekey_path: /etc/ssl/private/kthw-ca.key 
+      path: /etc/ssl/kthw/crt/admin.crt
+      csr_path: /etc/ssl/kthw/csr/admin.csr
+      ownca_path: /etc/ssl/kthw/crt/ca.crt
+      ownca_privatekey_path: /etc/ssl/kthw/private/ca.key 
       provider: ownca
-    when: inventory_hostname == 'jumpbox'
 
 # GENERATE THE CONTROLLER MANAGER CLIENT CERTFICATE
 
   - name: Generate a private key for the Kube Controller Manager
     openssl_privatekey:
-      path: /etc/ssl/private/kthw-kube-controller-manager.key
+      path: /etc/ssl/kthw/private/kube-controller-manager.key
       size: 2048
-    when: inventory_hostname == 'jumpbox'
 
   - name: Generate the CSR for the Kube Controller Manager
     openssl_csr:
-      path: /etc/ssl/csr/kthw-kube-controller-manager.csr
-      privatekey_path: /etc/ssl/private/kthw-kube-controller-manager.key
+      path: /etc/ssl/kthw/csr/kube-controller-manager.csr
+      privatekey_path: /etc/ssl/kthw/private/kube-controller-manager.key
       common_name: 'system:kube-controller-manager'
       organization_name: 'system:kube-controller-manager'
-    when: inventory_hostname == 'jumpbox'
 
   - name: Sign certficate for Kube Controller Manager using CA server's private key
     openssl_certificate:
-      path: /etc/ssl/crt/kthw-kube-controller-manager.crt
-      csr_path: /etc/ssl/csr/kthw-kube-controller-manager.csr
-      ownca_path: /etc/ssl/crt/kthw-ca.crt
-      ownca_privatekey_path: /etc/ssl/private/kthw-ca.key 
+      path: /etc/ssl/kthw/crt/kube-controller-manager.crt
+      csr_path: /etc/ssl/kthw/csr/kube-controller-manager.csr
+      ownca_path: /etc/ssl/kthw/crt/ca.crt
+      ownca_privatekey_path: /etc/ssl/kthw/private/ca.key 
       provider: ownca
-    when: inventory_hostname == 'jumpbox'
     
+# GENERATE THE SCHEDULER CLIENT CERTFICIATE
+
+  - name: Generate a private key for the Kube Scheduler 
+    openssl_privatekey:
+      path: /etc/ssl/kthw/private/kube-scheduler.key
+      size: 2048
+
+  - name: Generate the CSR for the Kube Scheduler
+    openssl_csr:
+      path: /etc/ssl/kthw/csr/kube-scheduler.csr
+      privatekey_path: /etc/ssl/kthw/private/kube-scheduler.key
+      common_name: 'system:kube-scheduler'
+      organization_name: 'system:kube-scheduler'
+
+  - name: Sign certificate for the Kube Scheduler using CA server's private key
+    openssl_certificate:
+      path: /etc/ssl/kthw/crt/kube-scheduler.crt
+      csr_path: /etc/ssl/kthw/csr/kube-scheduler.csr
+      ownca_path: /etc/ssl/kthw/crt/ca.crt
+      ownca_privatekey_path: /etc/ssl/kthw/private/ca.key 
+      provider: ownca
+
+  # GENERATE 
+
+- name: Distribute the certficates
+  hosts: 
+  - controlplane
+  vars:
+    cert_names:
+    - "ca"
+    - "admin"
+    - "kube-controller-manager"
+    - "kube-scheduler"
+    file_parts:
+    - suffix: crt
+      path: crt
+      cert_names: "{{ cert_names }}"
+    - suffix: key
+      path: private
+      cert_names: "{{ cert_names }}"
+    
+  tasks:
+
+  - name: Copy the keys into memory
+    become: true
+    delegate_to: localhost
+    slurp:
+      src: "/etc/ssl/kthw/private/{{item}}.key"    
+    loop: "{{ cert_names }}"
+    register: slurped_key
+
+  - name: Copy the key files to the hosts
+    copy:
+      dest: /home/vagrant/{{item.item}}.key
+      owner: vagrant
+      mode: 0600
+      content: "{{ item.content | b64decode }}"
+    loop: "{{ slurped_key.results }}"
+
+  - name: Copy the certs to the hosts
+    copy:
+      src: "/etc/ssl/kthw/crt/{{item}}.crt"
+      dest: "/home/vagrant/{{item}}.crt"
+    loop: "{{ cert_names }}"
+
 ...
