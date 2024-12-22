@@ -1,0 +1,27 @@
+---
+
+- name: Generate Kubernetes Configuration Files for Authentication
+  hosts:
+  - controlplane
+  vars:
+    kubeconfigs:
+    - config_file_name: "kube-controller-manager.kubeconfig"
+      server: "127.0.0.1"
+      user: "system:kube-controller-manager"
+      certificate_authority: "ca.crt"
+      client_certificate: kube-controller-manager.crt
+      client_key: kube-controller-manager.key    
+    - config_file_name: "kube-scheduler.kubeconfig"
+      server: "127.0.0.1"
+      user: "system:kube-scheduler"
+      certificate_authority: "ca.crt"
+      client_certificate: kube-scheduler.crt
+      client_key: kube-scheduler.key    
+
+  tasks:
+  - name: The kube-proxy Kubernetes configuation file
+    template:
+      src: templates/kubeconfig.j2
+      dest: /home/vagrant/{{ item.config_file_name }}
+    loop: "{{ kubeconfigs }}"
+...

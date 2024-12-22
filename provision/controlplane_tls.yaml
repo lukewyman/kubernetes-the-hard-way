@@ -5,9 +5,6 @@
   - jumpbox
 
   tasks:
-  - name: Ping the host 
-    ping: 
-
   - name: Create the /etc/ssl/kthw/crt directory
     file:
       path: /etc/ssl/kthw/crt
