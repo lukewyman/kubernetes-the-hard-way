@@ -1,0 +1,100 @@
+---
+
+- name: Bootstrap ETCD
+  hosts: controlplane
+  vars:
+    arch: amd64
+    etcd_version: "v3.5.9"
+
+
+  tasks:
+
+  - name: Download the ETCD binaries
+    get_url: 
+      url: "https://github.com/coreos/etcd/releases/download/${etcd_version}/etcd-${etcd_version}-linux-${arch}.tar.gz"
+      dest: /home/vagrant
+
+  - name: Create temp dir for ETCD binaries
+    file: 
+      path: "/home/vagrant/etcd-${etcd_version}-linux-${arch}"
+      state: directory
+      mode: 0600
+  
+  - name: Extract the etcd and etcdctl binaries
+    unarchive:
+      remote_src: yes
+      src: "/home/vagrant/etcd-${etcd_version}-linux-${arch}.tar.gz"
+      dest: "/home/vagrant/etcd-${etcd_version}-linux-${arch}"
+
+  - name: Install the etcd and etcdctl binaries
+    copy: 
+      src: "/home/vagrant/etcd-${etcd_version}-linux-${arch}/etcd*"
+      dest: "/usr/local/bin/"
+      mode: 0600
+
+  - name: Create /var/lib/etd directory
+    file:
+      path: /var/lib/etcd
+      state: directory
+      mode: 0600
+
+  - name: Create /etc/etcd directory
+    file:
+      path: /etc/etcd
+      state: directory
+      mode: 0600
+
+  - name: Create /var/lib/kubernetes/pki directory
+    file:
+      path: /var/lib/kubernetes/pki
+      state: directory
+      mode: 0600
+      
+  - name: Copy etcd-server.crt to /etc/etcd
+    copy: 
+      src: /etc/ssl/kthw/crt/etcd-server.crt
+      dest: /etc/etcd/etcd-server.crt
+      group: root 
+      owner: root 
+      mode: 0600
+
+  - name: Copy etcd-server.key to /etc/etcd
+    copy:
+      src: /etc/ssl/kthw/private/etcd-server.key
+      dest: /etc/etcd/etcd-server.key
+      group: root 
+      owner: root 
+      mode: 0600
+
+  - name: Copy ca.crt to /var/lib/kubernetes/pki/
+    copy:
+      src: /etc/ssl/kthw/crt/ca.crt
+      dest: /var/lib/kubernetes/pki
+      group: root 
+      owner: root 
+      mode: 0600
+
+  - name: Create symlink from /var/lib/kubernetes/pki/ca.crt to /etc/etcd/ca.crt
+    file: 
+      src: /var/lib/kubernetes/pki/ca.crt
+      dest: /etc/etcd/ca.crt
+      state: link 
+      group: root 
+      owner: root 
+
+  - name: Create the etcd.service systemd unit file
+    template:
+      src: templates/etcd.service.j2
+      dest: /etc/systemd/system/etcd.service
+      vars:
+        etcd_name: ""
+        primary_ip: ""
+        controlplane01: ""
+        controlplane02: ""
+
+  - name: Start the etcd server 
+    ansible.builtin.service:
+      name: etcd
+      state: started
+
+...
