@@ -1,0 +1,5 @@
+---
+
+- include_tasks: 00_copy_certs_and_configs.yaml
+
+...

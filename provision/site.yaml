@@ -1,0 +1,19 @@
+---
+
+- hosts: 
+  - jumpbox
+
+  tasks: 
+    - name: Create tls certificates and keys. Create kubeconfig files.
+      include_role:
+        name: common  
+
+- hosts:
+  - controlplane
+
+  tasks:
+    - name: Copy the tls certificates, keys and kubeconfig files to controlplane01
+      include_role:
+        name: controlplane
+
+...

@@ -1,0 +1,25 @@
+---
+
+kubeconfig_names:
+  - "kube-proxy"
+  - "kube-controller-manager"
+  - "kube-scheduler"
+cert_names:
+  - "ca"
+  - "admin"
+  - "kube-controller-manager"
+  - "kube-proxy"
+  - "kube-scheduler"
+  - "kube-apiserver"
+  - "apiserver-kubelet-client"
+  - "etcd-server"
+  - "service-account"
+file_parts:
+  - suffix: crt
+    path: crt
+    cert_names: "{{ cert_names }}"
+  - suffix: key
+    path: private
+    cert_names: "{{ cert_names }}"
+
+...
