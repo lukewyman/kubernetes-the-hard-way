@@ -1,9 +1,6 @@
 ---
 
-kubeconfig_names:
-  - "kube-proxy"
-  - "kube-controller-manager"
-  - "kube-scheduler"
+arch: amd64
 cert_names:
   - "ca"
   - "admin"
@@ -14,6 +11,7 @@ cert_names:
   - "apiserver-kubelet-client"
   - "etcd-server"
   - "service-account"
+etcd_version: "v3.5.9"
 file_parts:
   - suffix: crt
     path: crt
@@ -21,5 +19,19 @@ file_parts:
   - suffix: key
     path: private
     cert_names: "{{ cert_names }}"
+kubeconfig_names:
+  - "kube-proxy"
+  - "kube-controller-manager"
+  - "kube-scheduler"
+service_files:
+  - service_file_name: kube-apiserver.service
+    primary_ip: "192.168.56.11"
+    controlplane01: "192.168.56.11"
+    controlplane02: "192.168.56.12"
+    loadbalancer: "192.168.56.30"
+    service_cidr: "10.96.0.0/16"
+  - service_file_name: kube-controller-manager.service
+    pod_cidr: 10.244.0.0/16
+    service_cidr: 10.96.0.0/16
 
 ...

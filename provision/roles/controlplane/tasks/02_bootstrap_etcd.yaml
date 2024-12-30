@@ -1,0 +1,119 @@
+---
+
+- name: Download the ETCD binaries
+  ansible.builtin.get_url: 
+    url: "https://github.com/coreos/etcd/releases/download/{{ etcd_version }}/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz"
+    dest: /home/vagrant
+
+- name: Extract the etcd binaries
+  become: true
+  unarchive:
+    remote_src: yes
+    src: "/home/vagrant/etcd-{{ etcd_version }}-linux-{{ arch }}.tar.gz"
+    dest: "/home/vagrant/"
+
+- name: Get the etcd binaries files
+  find:
+    paths: "/home/vagrant/etcd-{{ etcd_version }}-linux-{{ arch }}"
+    recurse: no 
+    patterns: "etcd*"
+  register: etcd_files
+
+- name: Install the etcd and etcdctl binaries
+  become: true
+  copy: 
+    remote_src: true
+    src: "{{ item.path }}"
+    dest: "/usr/local/bin/"
+    mode: 0755
+  with_items: "{{ etcd_files.files }}"
+
+- name: Create /var/lib/etd directory
+  become: true
+  file:
+    path: /var/lib/etcd
+    state: directory
+    mode: 0600
+
+- name: Create /etc/etcd directory
+  become: true
+  file:
+    path: /etc/etcd
+    state: directory
+    mode: 0600
+
+- name: Create /var/lib/kubernetes/pki directory
+  become: true
+  file:
+    path: /var/lib/kubernetes/pki
+    state: directory
+    mode: 0600
+    
+- name: Copy etcd-server.crt to /etc/etcd
+  become: true
+  copy: 
+    src: /etc/ssl/kthw/crt/etcd-server.crt
+    dest: /etc/etcd/etcd-server.crt
+    group: root 
+    owner: root 
+    mode: 0600
+
+- name: Copy the etcd server key into memory
+  become: true
+  delegate_to: localhost
+  slurp:
+    src: /etc/ssl/kthw/private/etcd-server.key
+  register: etcd_server_key
+
+- name: Copy etcd-server.key to /etc/etcd
+  become: true
+  copy:
+    content: "{{ etcd_server_key.content | b64decode }}"
+    dest: /etc/etcd/etcd-server.key
+    group: root 
+    owner: root 
+    mode: 0600
+
+- name: Copy ca.crt to /var/lib/kubernetes/pki/
+  become: true
+  copy:
+    src: /etc/ssl/kthw/crt/ca.crt
+    dest: /var/lib/kubernetes/pki
+    group: root 
+    owner: root 
+    mode: 0600
+
+- name: Create symlink from /var/lib/kubernetes/pki/ca.crt to /etc/etcd/ca.crt
+  become: true
+  file: 
+    src: /var/lib/kubernetes/pki/ca.crt
+    dest: /etc/etcd/ca.crt
+    state: link 
+    group: root 
+    owner: root 
+
+- name: Calculate primary_ip
+  ansible.builtin.shell: ip -4 addr show | grep "inet" | egrep -v '(dynamic|127\.0\.0)' | awk '{print $2}' | cut -d/ -f1
+  args:
+    executable: /bin/bash
+  register: primary_ip_result
+
+- name: Create the etcd.service systemd unit file
+  become: true
+  template:
+    src: templates/etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+  vars:
+    etcd_name: "{{ inventory_hostname }}"
+    primary_ip: "{{ primary_ip_result.stdout }}"
+    controlplane01: "192.168.56.11"
+    controlplane02: "192.168.56.12"
+
+- name: Start the etcd server 
+  become: true
+  ansible.builtin.service:
+    name: etcd
+    enabled: true
+    state: started
+
+...

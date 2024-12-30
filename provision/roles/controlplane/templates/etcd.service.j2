@@ -13,7 +13,7 @@ ExecStart=/usr/local/bin/etcd \
   --peer-trusted-ca-file=/etc/etcd/ca.crt \
   --peer-client-cert-auth \
   --client-cert-auth \
-  --initial-advertise-peer-urls https://${primary_ip}:2380 \
+  --initial-advertise-peer-urls https://{{ primary_ip }}:2380 \
   --listen-peer-urls https://{{ primary_ip }}:2380 \
   --listen-client-urls https://{{ primary_ip }}:2379,https://127.0.0.1:2379 \
   --advertise-client-urls https://{{ primary_ip }}:2379 \

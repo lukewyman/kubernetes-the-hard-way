@@ -1,0 +1,42 @@
+- name: Download the latest official Kubernetes release binaries
+  get_url:
+    url: "https://dl.k8s.io/release/{{ kube_version }}/bin/linux/{{ arch }}/{{ binary }}"
+    dest: "/usr/local/bin/{{ binary }}"
+    mode: 0700
+  loop:
+  - kube-apiserver
+  - kube-controller-manager
+  - kube-scheduler
+  - kubectl
+
+- name: Create the kubernetes pki directory
+  file:
+    path: /var/lib/kubernetes/pki 
+    state: directory
+    mode: 0600
+
+- name: Copy the keys into memory
+  become: true
+  delegate_to: localhost
+  slurp:
+    src: "/etc/ssl/kthw/private/{{item}}.key"
+  loop: "{{ cert_names }}"
+  register: slurped_key
+
+- name: Copy the key files to the hosts
+  copy:
+    dest: /var/lib/kubernetes/pki/{{item.item}}.key
+    owner: vagrant
+    mode: 0600
+    content: "{{ item.content | b64decode }}"
+  loop: "{{ slurped_key.results }}"
+
+- name: Copy the certs to the hosts
+  copy:
+    src: "/etc/ssl/kthw/crt/{{item}}.crt"
+    dest: "/var/lib/kubernetes/pki/{{item}}.crt"
+  loop: "{{ cert_names }}"
+
+
+  # CREATE SERVICE FILES FROM J2 TEMPLATES HERE!
+  

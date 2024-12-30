@@ -1,0 +1,15 @@
+---
+
+plugin: amazon.aws.aws_ec2
+regions:
+  - us-east-1
+filters:
+  tag:Project: 
+    - kubernetes-the-hard-way
+hostnames:
+  - tag:Name
+keyed_groups:
+  - key: tags.Role
+    separator: ''
+
+...
