@@ -1,0 +1,99 @@
+---
+  
+- name: Install packages for Kubernetes apt repository
+  become: true
+  ansible.builtin.apt:
+    update_cache: true 
+    name:
+      - apt-transport-https
+      - ca-certificates curl
+
+- name: Create the /etc/modules-load.d/k8s.conf file
+  become: true
+  ansible.builtin.copy:
+    src: /files/etc-modules-load.dk8s.conf 
+    dest: /etc/modules-load.d/k8s.conf
+
+- name: Make overlay kernel module persistent 
+  become: true
+  community.general.modprobe: 
+    name: overlay
+    state: present 
+
+- name: Make br_netfilter kernel module persistent
+  become: true 
+  community.general.modprobe:
+    name: br_netfilter
+    state: present 
+
+- name: Make kernel parameters persistent 
+  become: true
+  ansible.posix.sysctl: 
+    key: "{{ item }}"
+    value: 1 
+    sysctl_file: /etc/sysctl.d/k8s.conf
+    sysctl_set: true
+  with_items: 
+    - net.bridge.bridge-nf-call-iptables
+    - net.bridge.bridge-nf-call-ip6tables
+    - net.ipv4.ip_forward
+
+- name: Determine the latest version of Kubernetes
+  ansible.builtin.shell:
+    cmd: curl -L -s https://dl.k8s.io/release/stable.txt | awk 'BEGIN { FS="." } { printf "%s.%s", $1, $2 }'
+  args:
+    executable: /bin/bash
+  register: kube_version
+
+- name: Create /etc/apt/keyrings directory
+  ansible.builtin.file: 
+    path: /etc/apt/keyrings
+    state: directory
+
+- name: Download the Kubernetes public signing key 
+  become: true 
+  ansible.builtin.apt_key:
+    url: https://pkgs.k8s.io/core:/stable:/{{ kube_version }}/deb/Release.key
+    keyring: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+    
+- name: Add the Kubernetes apt repository 
+  become: true
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${KUBE_LATEST}/deb/ /"
+    dest: /etc/apt/sources.list.d/kubernetes.list
+
+- name: Install the container runtime and CNI components
+  become: true 
+  ansible.builtin.apt: 
+    update_cache: true 
+    name:
+      - containerd
+      - kubernetes-cni
+      - kubectl
+      - ipvsadm
+      - ipset
+
+- name: Create /etc/containerd directory 
+  become: true 
+  ansible.builtin.file:
+    path: /etc/containerd
+    state: directory 
+
+- name: Create containerd configuration
+  ansible.builtin.shell:
+    cmd: containerd config default | sed 's/SystemdCgroup = false/SystemdCgroup = true/'
+  args:
+    executable: /bin/bash
+  register: containerd_config
+
+- name: Write containerd configuration to file
+  become: true 
+  ansible.builtin.copy: 
+    contents: "{{ containerd_config }}"
+    dest: /etc/containerd/config.toml
+
+- name: Restart the containerd service 
+  ansible.builtin.service:
+    name: containerd
+    state: restarted
+...

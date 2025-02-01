@@ -1,0 +1,5 @@
+---
+
+- include_tasks: 01_create_tls_certs.yaml
+- include_tasks: 02_create_kubeconfigs.yaml
+...

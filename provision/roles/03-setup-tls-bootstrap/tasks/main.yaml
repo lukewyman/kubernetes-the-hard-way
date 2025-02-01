@@ -1,0 +1,27 @@
+---
+- name: Create the Boostrap Token to be used by Nodes (Kubelets) to invoke Certificate API
+  kubernetes.core.k8s:
+    kubeconfig: /kubeconfigs/admin.kubeconfig
+    state: present 
+    resource_definition: "{{ lookup('ansible.builtin.template',
+                          '/templates/bootstrap-token-07401b.yaml.j2',
+                          expiration=bootstrap_token_expiration) }}"
+
+- name: Authorize nodes (kubelets) to create CSR
+  kubernetes.core.k8s:
+    kubeconfig: /kubeconfigs/admin.kubeconfig
+    state: present 
+    src: /files/csrs-for-bootstrapping.yaml
+
+- name: Authorize nodes (kubelets) to approve CSRs
+  kubernetes.core.k8s:
+    kubeconfig: /kubeconfigs/admin.kubeconfig
+    state: present 
+    src: /files/auto-approve-csrs-for-group.yaml
+
+- name: Authorize nodes (kubelets) to Auto Renew Certificates on expiration
+  kubernetes.core.k8s:
+    kubeconfig: /kubeconfigs/admin.kubeconfig
+    state: present 
+    src: /files/auto-approve-renewals-for-nodes.yaml
+...

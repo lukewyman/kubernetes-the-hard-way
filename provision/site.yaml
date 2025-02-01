@@ -1,19 +1,22 @@
 ---
-
+# Prepare the tls certificates, keys and kubeconfig files on the localhost.
 - hosts: 
   - jumpbox
 
   tasks: 
     - name: Create tls certificates and keys. Create kubeconfig files.
       include_role:
-        name: common  
+        name: 01-tls-certs-and-kube-configs  
 
+# Install and configure k8s components on the controlplane.
 - hosts:
   - controlplane
 
   tasks:
-    - name: Copy the tls certificates, keys and kubeconfig files to controlplane01
+    - name: Bootstrap the controlplane
       include_role:
-        name: controlplane
+        name: 02-bootstrap-controlplane
+
+# Install and configure k8s components on the worker nodes.
 
 ...

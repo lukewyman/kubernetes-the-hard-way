@@ -1,6 +1,0 @@
----
-
-- include_tasks: 01_tls_certs.yaml
-- include_tasks: 02_configs.yaml
-
-...

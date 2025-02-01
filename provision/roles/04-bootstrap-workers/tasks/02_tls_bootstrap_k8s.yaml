@@ -1,0 +1,124 @@
+---
+
+- name: Determine the latest version of Kubernetes
+  ansible.builtin.shell:
+    cmd: curl -L -s https://dl.k8s.io/release/stable.txt
+  args:
+    executable: /bin/bash
+  register: kube_version
+
+- name: Download worker binaries
+  ansible.builtin.get_url:
+    url: "{{ item }}"
+    dest: /home/vagrant
+  with_items:
+    - https://dl.k8s.io/release/{{ kube_version }/bin/linux/${ARCH}/kube-proxy
+    - https://dl.k8s.io/release/{{ kube_version }/bin/linux/${ARCH}/kubelet
+
+- name: Create the installation directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory 
+    mode: 600
+  with_items:
+    - /var/lib/kubelet/pki 
+    - /var/lib/kube-proxy 
+    - /var/lib/kubernetes/pki 
+    - /var/run/kubernetes
+
+- name: Install the worker binaries
+  become: true
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin
+    mode: 0755
+  with_items:
+    - /home/vagrant/kube-proxy
+    - /home/vagrant/kubelet
+
+- name: Copy the kube-proxy.crt to the worker nodes
+  ansible.builtin.copy:
+    src: /etc/ssl/kthw/crt/kube-proxy.crt
+    dest: /var/lib/kubernetes/pki
+    mode: 0600 
+    owner: root
+
+- name: Slurp up the kube-proxy.key into memory
+  become: true
+  delegate_to: localhost
+  ansible.builtin.slurp:
+    src: /etc/ssl/kthw/private/kube-proxy.key
+  register: kube_proxy_key
+
+- name: Copy the kube-proxy.key to the worker nodes
+  ansible.builtin.copy: 
+    content: kube_proxy_key 
+    destination: /var/lib/kubernetes/pki
+    mode: 0600 
+    owner: root
+
+- name: Configure Kubelet to TLS Bootstrap
+  become: true
+  ansible.builtin.copy: 
+    content: "{{ lookup('ansible.builtin.template', 
+              '/templates/bootstrap-kubeconfig.j2', 
+              load_balancer_ip=load_balancer_ip) }}"
+    destination: /var/lib/kubelet/bootstrap-kubeconfig
+
+- name: Create Kubelet Config File
+  become: true 
+  ansible.builtin.copy: 
+    content: "{{ lookup('ansible.builtin.template',
+              '/templates/kubelet-config.yaml.j2',
+              cluster_dns=cluster_dns) }}"
+    destination: /var/lib/kubelet/kubelet-config.yaml
+    mode: 0600
+
+- name: Configure the Kubelet Service 
+  become: true 
+  ansible.builtin.copy: 
+    content: "{{ lookup('ansible.builtin.template',
+              '/templates/kubelet.service.j2',
+              primary_ip=primary_ip) }}"
+    destination: /etc/systemd/system/kubelet.service
+    mode: 0600
+
+- name: Copy the Kubernetes proxy kubeconfig to the worker nodes 
+  become: true 
+  ansible.builtin.copy:
+    src: /kubeconfigs/kube-proxy.kubeconfig
+    destination: /var/lib/kube-proxy/kube-proxy.kubeconfig 
+    mode: 0600
+    owner: root
+
+- name: Create the kube-proxy-config.yaml configuration file
+  become: true 
+  ansible.builtin.copy:
+    content: "{{ lookup('ansible.builtin.template',
+              '/templates/kube-proxy-config.yaml.j2',
+              pod_cidr=pod_cidr) }}"
+    destination: /var/lib/kube-proxy/kube-proxy-config.yaml
+    mode: 0600 
+
+- name: Create the kube-proxy.service systemd unit file
+  become: true 
+  ansible.builtin.copy: 
+    src: /files/kube-proxy.service
+    destination: /etc/systemd/system/kube-proxy.service
+    mode: 0600
+
+- name: Start the Kubernetes proxy service
+  become: true 
+  ansible.builtin.service:
+    name: kube-proxy
+    enabled: true 
+    state: started
+
+- name: Start the kubelet service 
+  become: true 
+  ansible.builtin.service: 
+    name: kubelet 
+    enabled: true 
+    state: started
+
+...

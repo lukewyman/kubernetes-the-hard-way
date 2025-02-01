@@ -1,0 +1,21 @@
+---
+- name: Configure pod networking
+  kubernetes.core.k8s:
+    state: present 
+    src: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s-1.11.yaml
+
+- name: Create the system:kube-apiserver-to-kubelet ClusterRole 
+  kubernetes.core.k8s:
+    state: present 
+    src: /files/cluster-role.yaml
+
+- name: Bind the system:kube-apiserver-to-kubelet ClusterRole to the system:kube-apiserver user
+  kubernetes.core.k8s:
+    state: present 
+    src: /files/cluster-role-binding.yaml
+
+- name: Deploy the coredns cluster add-on 
+  kubernetes.core.k8s:
+    state: present 
+    src: https://raw.githubusercontent.com/mmumshad/kubernetes-the-hard-way/master/deployments/coredns.yaml
+...
