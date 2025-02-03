@@ -1,42 +1,109 @@
+- name: Calculate the kubernetes version for the release binaries
+  ansible.builtin.command:
+    cmd: curl -L -s https://dl.k8s.io/release/stable.txt
+  args:
+    executable: /bin/bash
+  register: kube_version
+
 - name: Download the latest official Kubernetes release binaries
-  get_url:
-    url: "https://dl.k8s.io/release/{{ kube_version }}/bin/linux/{{ arch }}/{{ binary }}"
-    dest: "/usr/local/bin/{{ binary }}"
-    mode: 0700
+  become: true 
+  ansible.builtin.get_url:
+    url: "https://dl.k8s.io/release/{{ kube_version.stdout }}/bin/linux/{{ arch }}/{{ item }}"
+    dest: "/usr/local/bin/{{ item }}"
+    mode: 0755
   loop:
   - kube-apiserver
   - kube-controller-manager
   - kube-scheduler
   - kubectl
 
-- name: Create the kubernetes pki directory
-  file:
-    path: /var/lib/kubernetes/pki 
-    state: directory
-    mode: 0600
+# - name: Create the kubernetes pki directory
+#   become: true
+#   ansible.builtin.file:
+#     path: /var/lib/kubernetes/pki 
+#     state: directory
+#     mode: 0600
 
 - name: Copy the keys into memory
   become: true
   delegate_to: localhost
-  slurp:
-    src: "/etc/ssl/kthw/private/{{item}}.key"
-  loop: "{{ cert_names }}"
+  ansible.builtin.slurp:
+    src: "/etc/ssl/kthw/private/{{ item }}.key"
+  loop: "{{ k8s_pki_cert_names }}"
   register: slurped_key
 
 - name: Copy the key files to the hosts
-  copy:
-    dest: /var/lib/kubernetes/pki/{{item.item}}.key
-    owner: vagrant
-    mode: 0600
+  become: true
+  ansible.builtin.copy:
     content: "{{ item.content | b64decode }}"
+    dest: "/var/lib/kubernetes/pki/{{ item.item }}.key"
+    owner: root
+    mode: 0600    
   loop: "{{ slurped_key.results }}"
 
 - name: Copy the certs to the hosts
-  copy:
+  become: true
+  ansible.builtin.copy:
     src: "/etc/ssl/kthw/crt/{{item}}.crt"
     dest: "/var/lib/kubernetes/pki/{{item}}.crt"
-  loop: "{{ cert_names }}"
+    owner: root
+    mode: 0600
+  loop: "{{ k8s_pki_cert_names }}"
 
+- name: Calculate primary_ip
+  ansible.builtin.shell: ip -4 addr show | grep "inet" | egrep -v '(dynamic|127\.0\.0)' | awk '{print $2}' | cut -d/ -f1
+  args:
+    executable: /bin/bash
+  register: primary_ip_result
 
-  # CREATE SERVICE FILES FROM J2 TEMPLATES HERE!
-  
+- name: Create the kube-apiserver.service systemd unit file
+  become: true
+  ansible.builtin.template:
+    src: templates/kube-apiserver.service.j2
+    dest: /etc/systemd/system/kube-apiserver.service
+  vars:
+    primary_ip: "{{ primary_ip_result }}"
+    controlplane01: "192.168.56.11"
+    controlplane02: "192.168.56.12"
+    loadbalancer: "192.168.56.30"
+    service_cidr: "10.96.0.0/16"
+
+- name: Move the kube-controller-manager.kubeconfig into place
+  become: true 
+  ansible.builtin.copy:
+    src: /kubeconfigs/kube-controller-manager.kubeconfig 
+    dest: /var/lib/kubernetes
+    mode: 0600
+
+- name: Create the kube-controller-manager.service systemd unit file
+  become: true 
+  ansible.builtin.template:
+    src: templates/kube-controller-manager.service.j2
+    dest: /etc/systemd/system/kube-controller-manager.service 
+  vars:
+    pod_cidr: 10.244.0.0/16
+    service_cidr: 10.96.0.0/16
+
+- name: Move the kube-scheduler.kubeconfig into place
+  become: true 
+  ansible.builtin.copy: 
+    src: /kubeconfigs/kube-scheduler.kubeconfig
+    dest: /var/lib/kubernetes
+    mode: 0600
+
+- name: Create the kube-scheduler.service systemd unit file 
+  become: true 
+  ansible.builtin.copy: 
+    src: files/kube-scheduler.service
+    dest: /etc/systemd/system/kube-scheduler.service
+
+- name: Start the controller services
+  become: true 
+  ansible.builtin.service: 
+    name: "{{ item }}"
+    enabled: true 
+    state: started
+  with_items:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler

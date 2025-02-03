@@ -1,6 +1,8 @@
 ---
 
 - include_tasks: 00_copy_certs_and_configs.yaml
-# - include_tasks: 01_encryption_keys.yaml
-# - include_tasks: 02_bootstrap_etcd.yaml
+- include_tasks: 01_encryption_keys.yaml
+- include_tasks: 02_bootstrap_etcd.yaml
+- include_tasks: 03_bootstrap_k8s.yaml
+
 ...

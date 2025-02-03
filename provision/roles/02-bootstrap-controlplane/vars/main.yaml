@@ -11,6 +11,14 @@ cert_names:
   - "apiserver-kubelet-client"
   - "etcd-server"
   - "service-account"
+k8s_pki_cert_names:
+  - "ca"
+  - "kube-controller-manager"
+  - "kube-scheduler"
+  - "kube-apiserver"
+  - "apiserver-kubelet-client"
+  - "etcd-server"
+  - "service-account"
 etcd_version: "v3.5.9"
 file_parts:
   - suffix: crt
