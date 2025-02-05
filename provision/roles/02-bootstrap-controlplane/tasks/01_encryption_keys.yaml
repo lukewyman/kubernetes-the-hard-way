@@ -1,3 +1,5 @@
+---
+
 - name: Generate encryption key
   ansible.builtin.command: 
     cmd: head -c 32 /dev/urandom 

@@ -1,0 +1,32 @@
+---
+
+- hosts:
+  - loadbalancer
+
+  tasks:
+
+  - name: Install haproxy 
+    become: true
+    ansible.builtin.apt: 
+      update_cache: true
+      name: 
+        - haproxy
+      
+  - name: Configure haproxy
+    become: true
+    ansible.builtin.template:
+      src: templates/haproxy.cfg.j2
+      dest: /etc/haproxy/haproxy.cfg
+    vars:
+      loadbalancer: "192.168.56.30"
+      controlplane01: "192.168.56.11"
+      controlplane02: "192.168.56.12"
+
+  - name: Restart the haproxy service 
+    become: true
+    ansible.builtin.service:
+      name: haproxy
+      enabled: true 
+      state: started
+      
+...

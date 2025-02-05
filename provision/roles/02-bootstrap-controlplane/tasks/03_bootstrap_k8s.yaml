@@ -1,3 +1,5 @@
+---
+
 - name: Calculate the kubernetes version for the release binaries
   ansible.builtin.command:
     cmd: curl -L -s https://dl.k8s.io/release/stable.txt
