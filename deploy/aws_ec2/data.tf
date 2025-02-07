@@ -1,14 +1,17 @@
-data "aws_ami" "image" {
-  most_recent = true
+data "aws_availability_zones" "available" {}
 
-  filter {
-    name = "owners"
-    values = ["099720109477"]
-  }
+data "aws_ami" "ubuntu_jammy_amd64" {
+  most_recent = true
+  owners = ["099720109477"]
   
   filter {
     name = "name"
     values = ["ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"]
+  }
+
+  filter {
+    name = "architecture"
+    values = ["x86_64"]
   }
 
   filter {
