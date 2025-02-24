@@ -1,98 +1,222 @@
-<!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<meta name="viewport" content="width=device-width, minimum-scale=1.0">
+<title>Kubernetes the Hard Way</title>
 
-<!-- Begin Jekyll SEO tag v2.8.0 -->
-<title>Kubernetes the Hard Way | An Adventure in Infrastructure as Code</title>
-<meta name="generator" content="Jekyll v3.9.3" />
-<meta property="og:title" content="Kubernetes the Hard Way" />
-<meta property="og:locale" content="en_US" />
-<meta name="description" content="An Adventure in Infrastructure as Code" />
-<meta property="og:description" content="An Adventure in Infrastructure as Code" />
-<link rel="canonical" href="http://localhost:4000/" />
-<meta property="og:url" content="http://localhost:4000/" />
-<meta property="og:site_name" content="Kubernetes the Hard Way" />
-<meta property="og:type" content="website" />
-<meta name="twitter:card" content="summary" />
-<meta property="twitter:title" content="Kubernetes the Hard Way" />
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebSite","description":"An Adventure in Infrastructure as Code","headline":"Kubernetes the Hard Way","name":"Kubernetes the Hard Way","url":"http://localhost:4000/"}</script>
-<!-- End Jekyll SEO tag -->
-
-    <link rel="stylesheet" href="/assets/css/style.css?v=fff01d9b964ba6b9b83f5ffc28b81dfc782ad842">
-    <script src="https://code.jquery.com/jquery-3.3.0.min.js" integrity="sha256-RTQy8VOmNlT6b2PIRur37p6JEBZUE7o8wPgMvu18MC4=" crossorigin="anonymous"></script>
-    <script src="/assets/js/main.js"></script>
-    <!--[if lt IE 9]>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" integrity="sha256-3Jy/GbSLrg0o9y5Z5n1uw0qxZECH7C6OQpVBgNFYa0g=" crossorigin="anonymous"></script>
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
-    <!-- start custom head snippets, customize with your own _includes/head-custom.html file -->
-
-<!-- Setup Google Analytics -->
+	<meta name="description" content="An adventure in Infrastructure as Code.">
 
 
+<link rel="icon" href="/favicon.ico" type="image/x-icon">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,400i,500,500i,700,700i|Noto+Sans:400,400i,700,700i|Source+Code+Pro&amp;subset=latin-ext">
+<link rel="stylesheet" href="/doks-theme/assets/css/style.css">
 
-<!-- You can set your favicon here -->
-<!-- link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" -->
+	</head>
+	<body class="">
+		<div class="hero-subheader hero-subheader--before-out">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-7">
+						<div class="align-container" data-mh>
+							<div class="align-inner">
+								
+									<h1 class="hero-subheader__title">Kubernetes the Hard Way</h1>
+								
+								
+									<p class="hero-subheader__desc">An adventure in Infrastructure as Code.</p>
+								
+								
+									
+									<a href="#" class="btn btn--dark btn--rounded btn--w-icon">
+										
+										Button
+									</a>
+									
+								
+									
+									<a href="#" class="btn btn--dark btn--rounded btn--w-icon">
+										<i class="icon icon--github"></i>
+										Button with icon
+									</a>
+									
+								
+							</div><!-- /.align-inner -->
+						</div><!-- /.align-container -->
+					</div><!-- /.col -->
+					
+						<div class="col-md-4 col-md-offset-1 hidden-xs hidden-sm">
+							<div class="align-container" data-mh>
+								<div class="align-inner">
+									<div class="hero-subheader__author">
+										<p class="hero-subheader__author-title">
+											
+											<a href="#" class="btn btn--read-more">
+												About Author
+												<i class="icon icon--arrow-right"></i>
+											</a>
+											
+										</p><!-- /.hero-subheader__author-title -->
+										<p>Author description</p>
+									</div><!-- /.hero-subheader__author -->
+								</div><!-- /.align-inner -->
+							</div><!-- /.align-container -->
+						</div><!-- /.col -->
+					
+				</div><!-- /.row -->
+			</div><!-- /.container -->
+		</div><!-- /.hero-subheader -->
+		
+			<div class="section section--darker-theme-color-bg">
+				<div class="container">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="nav-grid nav-grid--out">
+								<div class="row">
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">Project Conception</h2>
+													<p>Section description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">Vagrant and AWS EC2 - Parallel Environments</h2>
+													<p>Section Description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">The Vagrant Environment</h2>
+													<p>Section Description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">The AWS EC2 Environment</h2>
+													<p>Section Description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">The Ansible Playbook</h2>
+													<p>Section Description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+										<div class="col-sm-6 col-lg-4">
+											<a href="#" class="nav-grid__item">
+												<div class="nav-grid__content" data-mh>
+													<h2 class="nav-grid__title">Github Actions Pipeline</h2>
+													<p>Section Description</p>
+												</div><!-- /.nav-grid__content -->
+												<p class="nav-grid__btn">
+													Read more
+													<i class="icon icon--arrow-right"></i>
+												</p>
+											</a><!-- /.nav-grid__item -->
+										</div><!-- /.col -->
+									
+								</div><!-- /.row -->
+							</div><!-- /.nav-grid -->
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.container -->
+			</div><!-- /.section -->
+		
+		
+	<footer class="site-footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-sm-6">
+					
+						<a href="/" class="site-footer__logo">Project name</a>
+					
+					
+						<hr>
+						<p class="site-footer__copyright">Copyright &copy; 2017. - Project name <br>All rights reserved.</p>
+					
+				</div><!-- /.col -->
+				
+					<div class="col-sm-6 align-right">
+						<ul class="social-list">
+							
+								<li>
+									<a href="#" target="_blank" class="social-list__item social-list__item--facebook">
+										<i class="icon icon--facebook"></i>
+									</a>
+								</li>
+							
+								<li>
+									<a href="#" target="_blank" class="social-list__item social-list__item--twitter">
+										<i class="icon icon--twitter"></i>
+									</a>
+								</li>
+							
+								<li>
+									<a href="#" target="_blank" class="social-list__item social-list__item--instagram">
+										<i class="icon icon--instagram"></i>
+									</a>
+								</li>
+							
+								<li>
+									<a href="#" target="_blank" class="social-list__item social-list__item--youtube">
+										<i class="icon icon--youtube"></i>
+									</a>
+								</li>
+							
+						</ul><!-- /.social-list -->
+					</div><!-- /.col -->
+				
+			</div><!-- /.row -->
+		</div><!-- /.container -->
+	</footer><!-- /.site-footer -->
 
-<!-- end custom head snippets -->
 
-  </head>
-  <body>
-
-      <header>
-        <h1>Kubernetes the Hard Way</h1>
-        <p>An Adventure in Infrastructure as Code</p>
-      </header>
-
-      <div id="banner">
-        <span id="logo"></span>
-
-        <a href="https://github.com/lukewyman/kubernetes-the-hard-way" class="button fork"><strong>View On GitHub</strong></a>
-        
-      </div><!-- end banner -->
-
-    <div class="wrapper">
-      <nav>
-        <ul></ul>
-      </nav>
-      <section>
-        <p>Lorem ipsum odor amet, consectetuer adipiscing elit. Augue porttitor mauris quis senectus eros est ridiculus. Augue tincidunt placerat varius tristique velit eleifend. Vel dapibus nam vulputate odio curabitur. Condimentum a nostra efficitur iaculis ullamcorper a. Feugiat sed leo hac aliquam primis lorem. Pretium torquent etiam elementum gravida dignissim cras?</p>
-
-<h3 id="kubernetes-the-hard-way">Kubernetes the Hard Way</h3>
-
-<p>Lorem ipsum odor amet, consectetuer adipiscing elit. Augue porttitor mauris quis senectus eros est ridiculus. Augue tincidunt placerat varius tristique velit eleifend. Vel dapibus nam vulputate odio curabitur. Condimentum a nostra efficitur iaculis ullamcorper a. Feugiat sed leo hac aliquam primis lorem. Pretium torquent etiam elementum gravida dignissim cras?</p>
-
-<p>Ornare tempor purus ad est rutrum eleifend euismod egestas. Suspendisse litora taciti cubilia euismod dolor rutrum aenean arcu mattis. Ex inceptos commodo turpis duis nunc suspendisse nostra. Eros morbi class quis sapien placerat tincidunt. Pretium porta euismod aptent, nulla litora taciti. Scelerisque elit est aenean felis semper pretium. Ad egestas aliquet ac ligula fames erat scelerisque.</p>
-
-<h3 id="project-conception">Project Conception</h3>
-
-<p>Ornare tempor purus ad est rutrum eleifend euismod egestas. Suspendisse litora taciti cubilia euismod dolor rutrum aenean arcu mattis. Ex inceptos commodo turpis duis nunc suspendisse nostra. Eros morbi class quis sapien placerat tincidunt. Pretium porta euismod aptent, nulla litora taciti. Scelerisque elit est aenean felis semper pretium. Ad egestas aliquet ac ligula fames erat scelerisque.</p>
-
-<p>Blandit curae penatibus facilisis vehicula; sem nascetur luctus. Sem consequat velit leo nisi nostra, elit tortor porttitor vestibulum. Sociosqu nostra curae primis pretium quis per lacus consequat proin. Nisl nunc lobortis erat suscipit imperdiet nullam. Pharetra facilisis libero eros quam tincidunt praesent. Sollicitudin risus donec integer accumsan pharetra diam. Morbi id risus ex vitae sodales commodo arcu.</p>
-
-<h3 id="dividing-the-work---provisioning-and-deployment">Dividing the Work - Provisioning and Deployment</h3>
-
-<p>Blandit curae penatibus facilisis vehicula; sem nascetur luctus. Sem consequat velit leo nisi nostra, elit tortor porttitor vestibulum. Sociosqu nostra curae primis pretium quis per lacus consequat proin. Nisl nunc lobortis erat suscipit imperdiet nullam. Pharetra facilisis libero eros quam tincidunt praesent. Sollicitudin risus donec integer accumsan pharetra diam. Morbi id risus ex vitae sodales commodo arcu.</p>
-
-<p>Elementum torquent ultrices massa placerat tincidunt. Tempus velit blandit tincidunt nam fames interdum ad ex id. Turpis primis nisl potenti id inceptos dapibus. Cras odio primis cursus id tristique commodo, praesent ante. Facilisis fringilla molestie nullam varius mattis. Donec curae parturient dis nostra euismod elementum tempor justo? Fusce venenatis posuere habitasse magna nisl. Nec dictum augue suscipit inceptos accumsan diam. Erat himenaeos a quisque lacus scelerisque sodales facilisi.</p>
-
-<h3 id="the-pipeline-workflow">The Pipeline Workflow</h3>
-<p>Elementum torquent ultrices massa placerat tincidunt. Tempus velit blandit tincidunt nam fames interdum ad ex id. Turpis primis nisl potenti id inceptos dapibus. Cras odio primis cursus id tristique commodo, praesent ante. Facilisis fringilla molestie nullam varius mattis. Donec curae parturient dis nostra euismod elementum tempor justo? Fusce venenatis posuere habitasse magna nisl. Nec dictum augue suscipit inceptos accumsan diam. Erat himenaeos a quisque lacus scelerisque sodales facilisi.</p>
-
-<p>Gravida sociosqu consectetur nunc ac eleifend. Maximus vehicula sit fringilla efficitur ad volutpat? Cras luctus libero fermentum aliquam ornare viverra gravida diam senectus. Fusce nam curabitur torquent massa a tempor platea parturient mattis. Lacus potenti cubilia conubia; urna ex facilisi. Pretium lectus ex posuere convallis turpis phasellus arcu. Pellentesque parturient aenean iaculis pharetra etiam suspendisse inceptos netus. Luctus justo placerat sollicitudin congue feugiat dictum at varius dictum. At fermentum accumsan potenti diam a class amet.</p>
+<script src="/doks-theme/assets/js/vendor/jquery.min.js"></script>
+<script type="text/javascript" src="/doks-theme/assets/js/vendor/bootstrap/affix.min.js"></script>
+<script type="text/javascript" src="/doks-theme/assets/js/vendor/bootstrap/scrollspy.min.js"></script>
+<script type="text/javascript" src="/doks-theme/assets/js/vendor/matchHeight.min.js"></script>
+<script type="text/javascript" src="/doks-theme/assets/js/scripts.min.js"></script>
 
 
-      </section>
-      <footer>
-        
-          <p>Project maintained by <a href="https://github.com/lukewyman">lukewyman</a></p>
-        
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/mattgraham">mattgraham</a></small></p>
-      </footer>
-    </div>
-  </body>
+
+
+	</body>
 </html>
