@@ -1,5 +1,3 @@
-data "aws_availability_zones" "available" {}
-
 data "aws_ami" "ubuntu_jammy_amd64" {
   most_recent = true
   owners = ["099720109477"]

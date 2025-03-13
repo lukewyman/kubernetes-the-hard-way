@@ -2,11 +2,10 @@ module "kthw_vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.17.0"
 
-  name            = "kthw"
+  name            = var.project_name
   cidr            = var.vpc_cidr_block
   azs             = data.aws_availability_zones.available.names
   public_subnets  = var.vpc_public_subnets
-  private_subnets = var.vpc_private_subnets
 
   create_database_subnet_route_table = false
 
